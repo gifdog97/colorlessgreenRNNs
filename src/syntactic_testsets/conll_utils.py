@@ -18,7 +18,7 @@ from collections import namedtuple
 ConllConfig = namedtuple('CONLL_config',
                          ['INDEX', 'WORD', 'POS', 'LEMMA', 'MORPH',
                           'HEAD_INDEX', 'DEP_LABEL',
-                          'OFFSET', 'ROOT_INDEX', 'NCOLS'], verbose=False)
+                          'OFFSET', 'ROOT_INDEX', 'NCOLS'])
 
 UD_CONLL_CONFIG = ConllConfig(INDEX=0, WORD=1, LEMMA=2, POS=3, MORPH=5,
                               HEAD_INDEX=6, DEP_LABEL=7, OFFSET=1, ROOT_INDEX=0, NCOLS=10)
