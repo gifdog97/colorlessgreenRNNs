@@ -79,6 +79,11 @@ def morph_contexts_frequencies(trees, feature_list):
 
     :param trees: dependency trees
     :return: two dictionaries for left and right dependencies
+
+    Example of return value:
+        d[substring][l_features, r_features] = freq
+            - substring:  NOUN NOUN VERB, etc...
+            - x_features: either Number=Sing or Number=Plur
     """
     d_left = defaultdict(lambda: defaultdict(int))
     d_right = defaultdict(lambda: defaultdict(int))
@@ -112,9 +117,14 @@ def find_good_patterns(context_dict, freq_threshold):
     patterns = []
     for context in context_dict:
         left_right_pairs = context_dict[context].keys()
+        # [(l_feature_i, r_feature_i)]
+        # x_feature: either Number=Sing or Number=Plur
         if len(left_right_pairs) == 0:
             continue
         left, right = zip(*left_right_pairs)
+        # for example
+        # left:  tuple ('Number=Sing', 'Number=Plur')
+        # right: tuple ('Number=Sing', 'Number=Plur')
 
         left_v = set(left)
 
