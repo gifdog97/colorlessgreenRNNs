@@ -35,12 +35,13 @@ def generate_morph_pattern_test(trees, pattern, paradigms, vocab, n_sentences=10
         #pos_constr = "_".join(n.pos for n in t.nodes[l.index - 1: r.index])
 
         # filter model sentences with unk and the choice word not in vocab
-        if not all([n.word in vocab for n in nodes + [l, r]]):
-            n_vocab_unk += 1
-            continue
-        if not is_good_form(r.word, r.word, r.morph, r.lemma, r.pos, vocab, ltm_paradigms):
-            n_paradigms_unk += 1
-            continue
+        if vocab:
+            if not all([n.word in vocab for n in nodes + [l, r]]):
+                n_vocab_unk += 1
+                continue
+            if not is_good_form(r.word, r.word, r.morph, r.lemma, r.pos, vocab, ltm_paradigms):
+                n_paradigms_unk += 1
+                continue
 
         prefix = " ".join(n.word for n in t.nodes[:r.index])
 
@@ -140,9 +141,10 @@ def main():
     parser.add_argument('--treebank', type=str, required=True,
                         help='input file (in a CONLL column format)')
     parser.add_argument('--paradigms', type=str, required=True, help="the dictionary of tokens and their morphological annotations")
-    parser.add_argument('--vocab', type=str, required=True,help='(LM) Vocabulary to generate words from')
     parser.add_argument('--patterns', type=str, required=True)
     parser.add_argument('--output', type=str, required=True, help="prefix for generated text and annotation data")
+    parser.add_argument('--n_sentences', type=int, required=False, help='how many sentences to generate per one original sentence')
+    parser.add_argument('--vocab', type=str, required=False,help='(LM) Vocabulary to generate words from')
     parser.add_argument('--lm_data', type=str, required=False, help="path to LM data to estimate word frequencies")
     args = parser.parse_args()
 
@@ -162,7 +164,7 @@ def main():
     for line in open(args.patterns, "r"):
         print("Generating sentences with pattern", line.strip())
         #l_values = ('Gender=Fem|Number=Sing','Gender=Masc|Number=Plur')
-        data = generate_morph_pattern_test(trees, line.strip(), paradigms, vocab)
+        data = generate_morph_pattern_test(trees, line.strip(), paradigms, vocab, args.n_sentences)
         output.extend(data)
         print("Generated", len(data), "sentences")
 

@@ -27,6 +27,8 @@ def read_paradigms(path):
 
 
 def load_vocab(vocab_file):
+    if vocab_file is None:
+        return {}
     f_vocab = open(vocab_file, "r")
     vocab = {w: i for i, w in enumerate(f_vocab.read().split())}
     f_vocab.close()
@@ -146,8 +148,12 @@ def extract_sent_features(sents, gold, vocab, paradigms):
         sent_id = int(sent_id)
         r_idx = int(r_idx)
         l_idx = int(l_idx)
-        s_lm = " ".join([w if w in vocab else "<unk>" for w in s.split()[:r_idx]])
-        n_unk = len([w for w in s.split()[:r_idx] if w not in vocab ])
+        if vocab:
+            s_lm = " ".join([w if w in vocab else "<unk>" for w in s.split()[:r_idx]])
+            n_unk = len([w for w in s.split()[:r_idx] if w not in vocab ])
+        else:
+            s_lm = " ".join([w for w in s.split()[:r_idx]])
+            n_unk = 0
 
         if sent_id == 0:
             constr_id_unk.append((pattern_id, int(constr_id), n_unk))
