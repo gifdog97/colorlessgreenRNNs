@@ -50,50 +50,34 @@ def get_config(name):
         return UD_CONLL_FINE_POS_CONFIG
 
 
-def read_blankline_block(stream):
+def read_sentences_from_columns(stream):
     s = ''
-    list = []
+    comment = dict()
+    conllu_list = []
     while True:
         line = stream.readline()
         # End of file:
         if not line:
-            list.append(s)
-            return list
+            if not s:
+                return conllu_list
+            s = s.rstrip()
+            s_grid = [line.split('\t') for line in s.split('\n')]
+            conllu_list.append({'sentence': s_grid, 'comment': comment})
+            return conllu_list
         # Blank line:
-        elif line and not line.strip():
-            list.append(s)
+        elif not line.strip():
+            s = s.rstrip()
+            s_grid = [line.split('\t') for line in s.split('\n')]
+            conllu_list.append({'sentence': s_grid, 'comment': comment})
             s = ''
-        # Other line:
-        # in Google UD some lines can be commented and some can have multiword expressions/fused morphemes introduced by "^11-12    sss"
-        #  and not re.match("[0-9]+-[0-9]+",line) and not line.startswith("<")
-        elif not line.startswith("#"): # and "_\t_\t_\t_\t_\t" in line):
-            #        and not line.startswith("<"):
+            comment = dict()
+        # Comment line:
+        elif line.startswith("#"):
+            key, val = line[1:].split('=', 1)
+            comment[key.strip()] = val.strip()
+        # Conllu line:
+        else:
             s += line
-
-
-def read_sentences_from_columns(stream):
-    # grids are sentences in column format
-    grids = []
-    for block in read_blankline_block(stream):
-        block = block.strip()
-        if not block: continue
-
-        grid = [line.split('\t') for line in block.split('\n')]
-
-        appendFlag = True
-        # Check that the grid is consistent.
-        for row in grid:
-            if len(row) != len(grid[0]):
-                print(grid)
-                #raise ValueError('Inconsistent number of columns:\n%s'% block)
-                sys.stderr.write('Inconsistent number of columns', block)
-                appendFlag = False
-                break
-
-        if appendFlag:
-            grids.append(grid)
-
-    return grids
 
 
 def output_conll(sentences, prefix):

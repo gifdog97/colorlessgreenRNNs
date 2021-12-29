@@ -112,13 +112,14 @@ class Arc(object):
 
 
 class DependencyTree(object):
-    def __init__(self, nodes, arcs, config, fused_nodes):
+    def __init__(self, nodes, arcs, config, fused_nodes, comment):
         self.nodes = nodes
         self.arcs = arcs
         self.assign_sizes_to_nodes()
         self.config = config
         # for UD annotation to be able to recover original sentence (without split morphemes)
         self.fused_nodes = fused_nodes
+        self.comment = comment
 
     def __str__(self):
         return "\n".join([str(n) for n in self.nodes])
@@ -247,12 +248,12 @@ class DependencyTree(object):
         return Node(conll_config.ROOT_INDEX, "ROOT", "ROOT", 0, "ROOT", size=0)
 
     @classmethod
-    def from_sentence(cls, sentence, conll_config):
+    def from_sc(cls, sc, conll_config):
         nodes = []
         fused_nodes = []
 
-        for i in range(len(sentence)):
-            row = sentence[i]
+        for i in range(len(sc['sentence'])):
+            row = sc['sentence'][i]
 
             if conll_config.MORPH is not None:
                 morph = row[conll_config.MORPH]
@@ -298,7 +299,7 @@ class DependencyTree(object):
             else:
                 arcs.append(Arc(head_element, Arc.LEFT, node))
                 node.dir = Arc.LEFT
-        return cls(nodes, arcs, conll_config, fused_nodes)
+        return cls(nodes, arcs, conll_config, fused_nodes, sc['comment'])
 
     def pprint(self, conll_config, lower_case=False):
         # TODO: change the indices of heads in accordance with the config
@@ -326,18 +327,18 @@ class DependencyTree(object):
 
 
 def load_trees_from_conll(file_name, config=None):
-    sentences = conll_utils.read_sentences_from_columns(open(file_name))
+    sc_list = conll_utils.read_sentences_from_columns(open(file_name))
     # config for the default cases, to facilitate handling of multiple formats at the same time
     # for guaranteed performance, config should be supplied
     if config is None:
-        if len(sentences[0][0]) == conll_utils.ZGEN_CONLL_CONFIG.NCOLS:
+        if len(sc_list[0]['sentence'][0]) == conll_utils.ZGEN_CONLL_CONFIG.NCOLS:
             config = conll_utils.ZGEN_CONLL_CONFIG
-        elif len(sentences[0][0]) == conll_utils.UD_CONLL_CONFIG.NCOLS:
+        elif len(sc_list[0]['sentence'][0]) == conll_utils.UD_CONLL_CONFIG.NCOLS:
             config = conll_utils.UD_CONLL_CONFIG
         else:
             print("Unrecognised format of ", file_name)
             return None
     trees = []
-    for s in sentences:
-        trees.append(DependencyTree.from_sentence(s, config))
+    for sc in sc_list:
+        trees.append(DependencyTree.from_sc(sc, config))
     return trees
