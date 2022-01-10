@@ -69,7 +69,7 @@ def generate_morph_pattern_test(trees, pattern, paradigms, vocab, n_sentences=10
                                   str(r.index - 1), r.pos, r.morph, form, form_alt, lemma,
                                   str(l.index - 1), l.pos, prefix]) + "\n"
 
-            output.append((new_context + " <eos>\n", gold_str))
+            output.append((new_context + " <eos>\n", gold_str, t.comment['sent_id'] + '\n'))
 
         constr_id += 1
 
@@ -157,6 +157,7 @@ def main():
     f_text = open(args.output + ".text", "w")
     f_gold = open(args.output + ".gold", "w")
     f_eval = open(args.output + ".eval", "w")
+    f_conllid = open(args.output + ".conllid", "w")
 
     output = []
     vocab = load_vocab(args.vocab)
@@ -169,10 +170,11 @@ def main():
         print("Generated", len(data), "sentences")
 
     random.shuffle(output)
-    sents, golds = zip(*output)
+    sents, golds, conllids = zip(*output)
 
     f_text.writelines(sents)
     f_gold.writelines(golds)
+    f_conllid.writelines(conllids)
     # save the index of the target word to evaluate
     f_eval.writelines([g.split("\t")[3] + "\n" for g in golds])
 
