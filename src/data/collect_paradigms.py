@@ -19,20 +19,34 @@ parser.add_argument('--nwords', type=int, default='100000000', required=False,
                     help='How many words to process')
 parser.add_argument('--min_freq', type=int, default='5', required=False,
                     help='Minimal frequency of paradigm to be included in the dictionary')
+parser.add_argument('--serial', action='store_true', required=False)
 args = parser.parse_args()
 
 nwords = 0
 paradigms = defaultdict(int)
-for line in data_utils.read(args.input):
-    if line.strip() == "" or len(line.split("\t")) < 2:
-        continue
-    else:
-        fields = line.split("\t")
-        if fields[1].isalpha():
-            paradigms[(fields[1], fields[2], fields[3], fields[5])] += 1
-        nwords += 1
-    if nwords > args.nwords:
-        break
+if args.serial:
+    for i in range(100):
+        for line in data_utils.read(f'{args.input}/agree-{str(i).zfill(2)}.conllu'):
+            if line.strip() == "" or len(line.split("\t")) < 2:
+                continue
+            else:
+                fields = line.split("\t")
+                if fields[1].isalpha():
+                    paradigms[(fields[1], fields[2], fields[3], fields[5])] += 1
+                nwords += 1
+            if nwords > args.nwords:
+                break
+else:
+    for line in data_utils.read(args.input):
+        if line.strip() == "" or len(line.split("\t")) < 2:
+            continue
+        else:
+            fields = line.split("\t")
+            if fields[1].isalpha():
+                paradigms[(fields[1], fields[2], fields[3], fields[5])] += 1
+            nwords += 1
+        if nwords > args.nwords:
+            break
 
 with open(args.output, 'w') as f:
     for p in paradigms:
