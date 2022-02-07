@@ -224,8 +224,8 @@ def main():
 
     # needed for original UD treebanks (e.g. Italian) which contain spans, e.g. 10-12
     # annotating mutlimorphemic words as several nodes in the tree
-    for t in trees:
-        t.remerge_segmented_morphemes()
+    # for t in trees:
+    #     t.remerge_segmented_morphemes()
 
     if args.features:
         args.features = args.features.split("|")

@@ -149,8 +149,8 @@ def main():
     args = parser.parse_args()
 
     trees = tm.load_trees_from_conll(args.treebank)
-    for t in trees:
-        t.remerge_segmented_morphemes()
+    # for t in trees:
+    #     t.remerge_segmented_morphemes()
 
     paradigms = read_paradigms(args.paradigms)
 
