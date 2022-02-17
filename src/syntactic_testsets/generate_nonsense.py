@@ -42,6 +42,8 @@ def generate_morph_pattern_test(trees, pattern, paradigms, vocab, n_sentences=10
             if not is_good_form(r.word, r.word, r.morph, r.lemma, r.pos, vocab, ltm_paradigms):
                 n_paradigms_unk += 1
                 continue
+        if not get_alt_form(r.lemma,r.pos,r.morph,ltm_paradigms):
+            continue
 
         prefix = " ".join(n.word for n in t.nodes[:r.index])
 

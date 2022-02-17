@@ -2,3 +2,8 @@ src/tmp/
 data/**/*.output_*
 **/__pycache__
 src/**/*.pyc
+**/*stdout
+**/*qsub*
+src/runexp.py
+data/lm/
+data/treebank/
