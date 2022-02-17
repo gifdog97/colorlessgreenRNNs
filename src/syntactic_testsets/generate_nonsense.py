@@ -170,6 +170,10 @@ def main():
         data = generate_morph_pattern_test(trees, line.strip(), paradigms, vocab, args.n_sentences)
         output.extend(data)
         print("Generated", len(data), "sentences")
+    
+    if not len(output):
+        print("No data extracted")
+        return
 
     random.shuffle(output)
     sents, golds, conllids = zip(*output)
